@@ -1,0 +1,11 @@
+<script>
+    // Save the access token
+    window.localStorage.setItem('discord_token', new URLSearchParams(window.location.hash.substr(1)).get('access_token'));
+
+    // Remove the access token from the URL from the history
+    history.replaceState(null, null, ' ');
+
+    // Close the window if we can
+    window.close();
+</script>
+You may close this page
