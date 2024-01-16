@@ -5,6 +5,7 @@ export interface Server {
   ping?: number;
   players?: number;
   friends?: number;
+  full?: boolean;
 }
 
 // Server names: Alpheratz, Bellatrix, Capella, Diphda, Elnath, Fomalhaut, Gacrux, Hamal, Kochab, Menkar, Nunki, Procyon, Rigel, Schedar, Vega, Zubenelgenubi
@@ -52,9 +53,10 @@ export const pingServers = (userid: string, callback: (servers: Server[]) => voi
       const time = Date.now();
       const response = await fetch(`${url}?id=${userid}`);
       const data = await response.json();
-      server.ping = Date.now() - time;
+      server.ping = (Date.now() - time) || 1; // 0 ping breaks things lol
       server.players = data.players;
       server.friends = data.friends;
+      server.full = data.full;
       console.log(server);
       callback(servers);
     } catch (e) {}

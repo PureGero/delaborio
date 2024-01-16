@@ -8,8 +8,11 @@ public class DelaborioServer {
     private static final int PORT = Integer.parseInt(System.getProperty("port", "2052"));
     private static final int SSL_PORT = Integer.parseInt(System.getProperty("sslport", "2053"));
 
+    private final PlayerManager playerManager = new PlayerManager();
+
     public static void main(String[] args) throws Exception {
-        WebSocketServer webSocketServer = new WebSocketServer();
+        DelaborioServer server = new DelaborioServer();
+        WebSocketServer webSocketServer = new WebSocketServer(server);
 
         try {
             ChannelFuture futuressl = webSocketServer.listenOn(webSocketServer.createSslContext(), SSL_PORT);
@@ -26,4 +29,7 @@ public class DelaborioServer {
         }
     }
 
+    public PlayerManager getPlayerManager() {
+        return playerManager;
+    }
 }

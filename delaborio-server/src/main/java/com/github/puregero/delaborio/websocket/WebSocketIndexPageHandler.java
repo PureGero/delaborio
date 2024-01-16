@@ -1,5 +1,6 @@
 package com.github.puregero.delaborio.websocket;
 
+import com.sun.management.OperatingSystemMXBean;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -19,6 +20,7 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.CharsetUtil;
 
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
@@ -66,7 +68,8 @@ public class WebSocketIndexPageHandler extends SimpleChannelInboundHandler<FullH
 
             sendHttpResponse(ctx, req, res);
         } else if (req.uri() != null && req.uri().startsWith("/ping")) {
-            ByteBuf content = Unpooled.copiedBuffer("{\"players\":1,\"friends\":1}", CharsetUtil.UTF_8);
+            boolean full = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() > 0.8;
+            ByteBuf content = Unpooled.copiedBuffer("{\"players\":1,\"friends\":1,\"full\":" + full + "}", CharsetUtil.UTF_8);
             FullHttpResponse res = new DefaultFullHttpResponse(req.protocolVersion(), OK, content);
             res.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
             res.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "*");

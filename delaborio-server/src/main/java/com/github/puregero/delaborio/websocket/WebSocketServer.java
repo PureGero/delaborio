@@ -1,5 +1,6 @@
 package com.github.puregero.delaborio.websocket;
 
+import com.github.puregero.delaborio.DelaborioServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -25,10 +26,15 @@ import java.util.concurrent.Executor;
 
 public class WebSocketServer {
 
+    private final DelaborioServer server;
     protected EventLoopGroup eventLoopGroup;
     protected Class<? extends SocketChannel> socketChannelClass;
     protected Class<? extends ServerSocketChannel> serverSocketChannelClass;
     protected Executor eventLoopThreadFactory = new ThreadPerTaskExecutor(new DefaultThreadFactory(threadName(), daemon()));
+
+    public WebSocketServer(DelaborioServer server) {
+        this.server = server;
+    }
 
     public SslContext createSslContext() throws CertificateException, SSLException {
         SelfSignedCertificate cert = new SelfSignedCertificate();
@@ -54,7 +60,7 @@ public class WebSocketServer {
         return new ServerBootstrap()
                 .group(getEventLoopGroup())
                 .channel(serverSocketChannelClass)
-                .childHandler(new WebSocketServerInitializer(sslCtx))
+                .childHandler(new WebSocketServerInitializer(sslCtx, server))
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
     }
 
