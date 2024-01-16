@@ -1,24 +1,3 @@
-.classpath
-.project
-.settings
-eclipse
-.idea
-*.iml
-*.ipr
-*.iws
-.DS_Store
-.metadata
-bin
-*~
-fileTemplates
-
-build
-target
-.gradle
-out
-
-*.sh
-
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

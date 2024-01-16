@@ -1,0 +1,65 @@
+.ping-container {
+  height: 1.125rem;
+  width: 1.125rem;
+
+  div {
+    display: inline-block;
+    height: 1.125rem;
+    background-image: url(https://cdn-icons-png.flaticon.com/128/9498/9498764.png);
+    background-size: 1.125rem;
+  }
+
+  .right {
+    background-position: right;
+  }
+}
+
+.ping-container.full {
+  .left { 
+    filter: invert(49%) sepia(37%) saturate(7498%) hue-rotate(94deg) brightness(98%) contrast(105%);
+    width: 100%;
+  }
+  .right {
+    width: 0%;
+  }
+}
+
+.ping-container.high {
+  .left {
+    filter: invert(49%) sepia(37%) saturate(7498%) hue-rotate(94deg) brightness(98%) contrast(105%);
+    width: 75%;
+  }
+  .right {
+    width: 25%;
+  }
+}
+
+.ping-container.mid {
+  .left {
+    filter: invert(81%) sepia(71%) saturate(897%) hue-rotate(6deg) brightness(87%) contrast(101%);
+    width: 50%;
+  }
+  .right {
+    width: 50%;
+  }
+}
+
+.ping-container.low {
+  .left {
+    filter: invert(16%) sepia(45%) saturate(5610%) hue-rotate(355deg) brightness(83%) contrast(127%);
+    width: 25%;
+  }
+  .right {
+    width: 75%;
+  }
+}
+
+.ping-container.none {
+  .left {
+    filter: invert(16%) sepia(45%) saturate(5610%) hue-rotate(355deg) brightness(83%) contrast(127%);
+    width: 0%;
+  }
+  .right {
+    width: 100%;
+  }
+}
