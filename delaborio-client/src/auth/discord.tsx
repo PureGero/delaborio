@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Account } from './common';
 import LoginButton from './LoginButton';
 
-const discordOauthUrl = 'https://discord.com/oauth2/authorize?client_id=1196307692394905680&response_type=token&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fdiscord.html&scope=identify';
+const discordOauthUrl = `https://discord.com/oauth2/authorize?client_id=1196307692394905680&response_type=token&redirect_uri=${encodeURIComponent(location.href.replace(location.hash,'').replace(location.search,''))}auth%2Fdiscord.html&scope=identify`;
 
 const discordLogo = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0 -28.5 256 256" version="1.1" preserveAspectRatio="xMidYMid">
 <g>
