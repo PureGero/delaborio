@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { GameContext } from "../GameContext";
 import ChatPacket from "../../net/packet/ChatPacket";
@@ -23,10 +23,11 @@ export default function Chat() {
     game.connection.sendPacket(new ChatPacket(message));
   }
 
-  let lastMessage: HTMLSpanElement | null = null;
+  const lastMessageRef = useRef(null) as React.MutableRefObject<HTMLSpanElement | null>;
   useEffect(() => {
-    if ((lastMessage?.offsetTop || 0) - (lastMessage?.parentElement?.clientHeight || 0) - (lastMessage?.parentElement?.scrollTop || 0) < 25) {
-      lastMessage?.scrollIntoView();
+    const lastMessage = lastMessageRef.current;
+    if (lastMessage && (lastMessage.offsetTop || 0) - (lastMessage.parentElement?.clientHeight || 0) - (lastMessage.parentElement?.scrollTop || 0) < 25) {
+      lastMessage.scrollIntoView();
     }
   }, [chatLog]);
   
@@ -49,10 +50,10 @@ export default function Chat() {
       <div className="flex flex-col items-left border border-gray-200 h-48 p-1 overflow-y-scroll">
         <span key="first" className="mt-auto"></span>
         {chatLog.map(message => (<span key={message.uuid}>{message.message}</span>))}
-        <span key="last" ref={e => lastMessage = e}></span>
+        <span key="last" ref={lastMessageRef}></span>
       </div>
       <form onSubmit={sendChat} className="flex">
-        <input type="text" name="message" className="border border-gray-300 px-1 flex-grow" />
+        <input type="text" autoComplete="off" name="message" className="border border-gray-300 px-1 flex-grow" />
         <button type="submit" className="border border-gray-300 px-1">Send</button>
       </form>
     </div>
