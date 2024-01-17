@@ -39,6 +39,9 @@ function App() {
           </AccountContext.Provider>
         )
       }
+      <div className="absolute right-0 bottom-0 opacity-50 text-xs m-1">
+        <small>Version: {process.env.REACT_APP_GIT_SHA}</small>
+      </div>
     </div>
   );
 }
