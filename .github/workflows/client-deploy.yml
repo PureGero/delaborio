@@ -43,6 +43,7 @@ jobs:
     - name: Build
       working-directory: ./delaborio-client
       run: |
+        export PUBLIC_URL=.
         npm run build
 
     - name: Setup Pages
