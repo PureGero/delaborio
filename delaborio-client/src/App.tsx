@@ -6,6 +6,7 @@ import { AccountContext } from './auth/AccountContext';
 import ServerList from './server_list/ServerList';
 import Game from './game/game';
 import { GameContext } from './game/GameContext';
+import GameUI from './game/GameUI';
 
 function App() {
   const [account, setAccount] = useState<Account | null>(null);
@@ -16,9 +17,7 @@ function App() {
       {
         game != null ? (
           <GameContext.Provider value={game}>
-            <Backdrop>
-              [game goes here]
-            </Backdrop>
+            <GameUI />
           </GameContext.Provider>
         ) : account == null ? (
           <Backdrop>
@@ -31,7 +30,11 @@ function App() {
               <img alt="Your avatar" src={account.avatar} className="bg-white rounded-full h-24 w-24 m-3 shadow-md"></img>
               <span className="text-center text-xl">Welcome {account.globalName}!</span>
               <DiscordLogoutButton />
-              <ServerList joinServer={server => setGame(new Game(server, account))} />
+              <ServerList joinServer={server => {
+                const game = new Game(server, account);
+                game.connection.initConnection();
+                setGame(game)
+              }} />
             </Backdrop>
           </AccountContext.Provider>
         )

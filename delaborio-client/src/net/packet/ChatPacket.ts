@@ -11,5 +11,6 @@ export default class ChatPacket extends Packet {
 
   handle(connection: Connection) {
     console.log(`[CHAT] ${this.message}`);
+    connection.game.onChat(this.message);
   }
 }

@@ -7,10 +7,11 @@ export default class Game {
   account: Account;
   connection: Connection;
 
+  onChat: (message: string) => void = () => {};
+
   constructor(server: Server, account: Account) {
     this.server = server;
     this.account = account;
-
     this.connection = new Connection(server, this);
   }
 }
