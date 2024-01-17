@@ -2,6 +2,8 @@
 
 An mmorpg game created to experiment with multiple technologies
 
+Try it out here: https://puregero.github.io/delaborio/
+
 ## Technologies
 
 ### Multiple game servers
