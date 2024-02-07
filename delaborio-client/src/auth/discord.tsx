@@ -25,6 +25,12 @@ const fetchAccount = async (): Promise<Account | null> => {
         authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.status !== 200) {
+      // Invalid token
+      return null;
+    }
+
     const json = await response.json();
     return {
       userid: `discord-${json.id}`,

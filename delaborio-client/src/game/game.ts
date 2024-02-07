@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { Account } from '../auth/common';
 import Connection from '../net/connection';
 import { Server } from '../net/servers';
