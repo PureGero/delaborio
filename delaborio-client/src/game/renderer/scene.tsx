@@ -3,13 +3,14 @@ import * as THREE from 'three';
 export default class Scene {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  ambientLight = new THREE.PointLight(0xffffff, 2, 0, 0);
+  ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  pointLight = new THREE.PointLight(0xffffff, 1, 0, 0);
 
   constructor() {
     this.setCameraTarget(0, 0, 0);
 
-    this.ambientLight.position.set(0, 0, 5);
     this.scene.add(this.ambientLight);
+    this.scene.add(this.pointLight);
     this.scene.background = new THREE.Color(0xFFFFFF);
   }
 
@@ -19,5 +20,6 @@ export default class Scene {
     this.camera.rotation.x = Math.PI / 8;
     this.camera.rotation.y = Math.PI / 8;
     this.camera.rotation.z = Math.PI / 4;
+    this.pointLight.position.set(x, y, z + 5);
   }
 }

@@ -48,5 +48,7 @@ export default class Player extends Entity {
 
     game.scene.setCameraTarget(this.position.x, this.position.y, this.position.z);
     this.setPosition(this.position);
+
+    game.world.render(this.position);
   }
 }
