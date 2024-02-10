@@ -5,15 +5,26 @@ import alea from 'alea';
 import Entity from './entity';
 import Maze from './maze';
 
-class BlockMap {
-  map: Map<number, THREE.Mesh> = new Map();
+class CoordMap<T> {
+  map: Map<number, T> = new Map();
 
-  get(x: number, y: number): THREE.Mesh | undefined {
+  get(x: number, y: number): T | undefined {
     return this.map.get(this.key(x, y));
   }
 
-  set(x: number, y: number, mesh: THREE.Mesh) {
-    this.map.set(this.key(x, y), mesh);
+  getOrGenerate(x: number, y: number, generate: (key: number) => T): T {
+    const existing = this.get(x, y);
+    if (existing) {
+      return existing;
+    }
+
+    const generated = generate(this.key(x, y));
+    this.set(x, y, generated);
+    return generated;
+  }
+
+  set(x: number, y: number, value: T) {
+    this.map.set(this.key(x, y), value);
   }
 
   remove(x: number, y: number) {
@@ -21,7 +32,7 @@ class BlockMap {
   }
 
   private key(x: number, y: number): number {
-    return Math.floor(x) + Math.floor(y) * 256 * 256;
+    return Math.floor(x) + Math.floor(y) * 256 * 256 * 7;
   }
 }
 
@@ -30,9 +41,10 @@ export default class World {
 
   scene: Scene;
 
-  blocks: BlockMap = new BlockMap();
+  blocks: CoordMap<THREE.Mesh> = new CoordMap();
   entities: Entity[] = [];
-  maze: Maze = new Maze(10, 10, alea(0));
+  mazes: CoordMap<Maze> = new CoordMap();
+  masterMazes: CoordMap<Maze> = new CoordMap();
 
   noise2D: NoiseFunction2D[] = new Array(100).fill(0).map((v, i) => createNoise2D(alea(i)));
 
@@ -43,7 +55,7 @@ export default class World {
   }
 
   createBlock(x: number, y: number, z: number, color: number) {
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
+    const geometry = new THREE.BoxGeometry( 1, 1, 4 ); 
     const material = new THREE.MeshStandardMaterial( {color} ); 
     const cube = new THREE.Mesh( geometry, material ); 
     cube.position.set(x, y, z);
@@ -65,6 +77,8 @@ export default class World {
   removeBlock(x: number, y: number) {
     const block = this.blocks.get(x, y);
     if (block) {
+      block.geometry.dispose();
+      new Array(0).concat(block.material).forEach(mat => mat.dispose());
       this.scene.scene.remove(block);
       this.blocks.remove(x, y);
     }
@@ -116,22 +130,72 @@ export default class World {
     }
 
     let color = 0;
-    color |= 0x00ff00;
-    color |= alea(x + y * 65536)() * 0xffffff;
 
-    if (x >= 0 && y >= 0 && x < this.maze.width * 2 && y < this.maze.height * 2) {
-      if (x % 2 === 0 && y % 2 === 0) {
-        color = 0xffffff;
-      } else if (x % 2 === 1 && y % 2 === 1) {
-        color = 0x000000;
-      } else if (x % 2 === 0 && y % 2 === 1) {
-        color = this.maze.isConnected(Math.floor(x / 2), Math.floor(y / 2), this.maze.NORTH) ? 0xffffff : 0x000000;
-      } else if (x % 2 === 1 && y % 2 === 0) {
-        color = this.maze.isConnected(Math.floor(x / 2), Math.floor(y / 2), this.maze.EAST) ? 0xffffff : 0x000000;
-      }
+    if (this.isMazeWall(x, y)) {
+      color = 0x101010;
+      z += 3;
+    } else {
+      color |= 0x00ff00;
+      color |= alea(x + y * 65536)() * 0xffffff;
     }
 
     this.createBlock(x, y, z, color);
   }
+
+  isMazeWall(x: number, y: number): boolean {
+    const cellSize = 8;
+    const mazeSize = 18;
+    const masterMazeSize = 51;
+    const actualMazeSize = mazeSize - 1;
+
+    x += mazeSize * cellSize / 2 - cellSize / 2;
+    y += mazeSize * cellSize / 2 - cellSize / 2;
+    x = Math.floor(x);
+    y = Math.floor(y);
+
+    const mazeX = Math.floor((x - 1) / cellSize / mazeSize); // The first x in the maze belongs to the wall of the previous maze
+    const mazeY = Math.floor((y - 1) / cellSize / mazeSize); // The first y in the maze belongs to the wall of the previous maze
+    const cellX = mod(Math.floor(x / cellSize), mazeSize);
+    const cellY = mod(Math.floor(y / cellSize), mazeSize);
+
+    x = mod(x, mazeSize * cellSize);
+    y = mod(y, mazeSize * cellSize);
+
+    // Master maze
+    if (x === 0 || y === 0 || cellX >= actualMazeSize || cellY >= actualMazeSize) {
+      const masterMaze = this.masterMazes.getOrGenerate(mazeX, mazeY, key => new Maze(masterMazeSize, masterMazeSize, alea(`mastermaze${key}`), 1));
+      const masterCellX = mod(Math.floor(mazeX + masterMaze.width / 2), masterMaze.width);
+      const masterCellY = mod(Math.floor(mazeY + masterMaze.height / 2), masterMaze.height);
+      if (x > actualMazeSize * cellSize / 2 - cellSize / 3 && x < actualMazeSize * cellSize / 2 + cellSize / 3) {
+        if (masterCellY === masterMaze.height - 1) {
+          return masterCellX !== Math.floor(masterMaze.width / 2);
+        }
+        return !masterMaze.isConnected(masterCellX, masterCellY, masterMaze.NORTH);
+      } else if (y > actualMazeSize * cellSize / 2 - cellSize / 3 && y < actualMazeSize * cellSize / 2 + cellSize / 3) {
+        if (masterCellX === masterMaze.width - 1) {
+          return masterCellY !== Math.floor(masterMaze.height / 2);
+        }
+        return !masterMaze.isConnected(masterCellX, masterCellY, masterMaze.EAST);
+      } else {
+        return true;
+      }
+    }
+
+    // Regular maze
+    if (x % cellSize !== 0 && y % cellSize !== 0) {
+      return false;
+    }
+
+    const maze = this.mazes.getOrGenerate(mazeX, mazeY, key => new Maze(actualMazeSize, actualMazeSize, alea(key), 3));
+
+    if (x % cellSize === 0 && y % cellSize === 0) {
+      return !(maze.isConnected(cellX, cellY, maze.SOUTH) && maze.isConnected(cellX, cellY, maze.WEST) && maze.isConnected(cellX - 1, cellY, maze.SOUTH) && maze.isConnected(cellX, cellY - 1, maze.WEST));
+    } else if (x % cellSize === 0) {
+      return !maze.isConnected(cellX, cellY, maze.WEST);
+    } else {
+      return !maze.isConnected(cellX, cellY, maze.SOUTH);
+    }
+  }
 }
 
+const mod = (n: number, m: number): number => (n % m + m) % m;

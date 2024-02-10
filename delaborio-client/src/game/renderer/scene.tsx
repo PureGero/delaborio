@@ -20,6 +20,6 @@ export default class Scene {
     this.camera.rotation.x = Math.PI / 8;
     this.camera.rotation.y = Math.PI / 8;
     this.camera.rotation.z = Math.PI / 4;
-    this.pointLight.position.set(x, y, z + 5);
+    this.pointLight.position.set(x, y, z + 1);
   }
 }

@@ -40,7 +40,7 @@ export default class Player extends Entity {
 
     let nz = this.position.z - 0.01 * diff;
     let blockStandingOn = game.world.getBlock(this.position.x, this.position.y);
-    let blockz = (blockStandingOn?.position.z || 0) + 1;
+    let blockz = (blockStandingOn?.position.z || 0) + 3;
     if (nz < blockz) {
       nz = blockz;
     }
