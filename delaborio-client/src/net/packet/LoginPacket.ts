@@ -12,11 +12,11 @@ export default class LoginPacket extends Packet {
 
   constructor(account: Account) {
     super();
-    this.userid = account.userid;
-    this.username = account.username;
-    this.avatar = account.avatar;
-    this.displayName = account.displayName;
-    this.accessToken = account.accessToken;
+    this.userid = account?.userid;
+    this.username = account?.username;
+    this.avatar = account?.avatar;
+    this.displayName = account?.displayName;
+    this.accessToken = account?.accessToken;
   }
 
   handle(connection: Connection) {
