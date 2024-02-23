@@ -1,5 +1,4 @@
 import Game from "../game/game";
-import ChatPacket from "./packet/ChatPacket";
 import LoginPacket from "./packet/LoginPacket";
 import Packet from "./packet/Packet";
 import packets from "./packet/packets";
@@ -31,7 +30,6 @@ export default class Connection {
     this.socket.onopen = event => {
       console.log('Connected to server');
       this.sendPacket(new LoginPacket(this.game.account));
-      this.sendPacket(new ChatPacket('Hello world!'));
     }
     this.socket.onclose = event => {
       console.log('Disconnected from server');

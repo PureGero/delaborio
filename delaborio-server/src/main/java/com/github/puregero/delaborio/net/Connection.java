@@ -1,10 +1,11 @@
 package com.github.puregero.delaborio.net;
 
 import com.github.puregero.delaborio.DelaborioServer;
+import com.github.puregero.delaborio.auth.DiscordAuth;
 import com.github.puregero.delaborio.entity.Player;
 import com.github.puregero.delaborio.net.packet.ChatPacket;
 import com.github.puregero.delaborio.net.packet.LoginPacket;
-import com.github.puregero.delaborio.websocket.WebSocketIndexPageHandler;
+import com.github.puregero.delaborio.websocket.WebSocketServerHttpPageHandler;
 import com.google.gson.Gson;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -49,17 +50,41 @@ public class Connection extends SimpleChannelInboundHandler<WebSocketFrame> {
         Object packet = gson.fromJson(json, Class.forName(ChatPacket.class.getPackageName() + "." + type));
 
         if (packet instanceof LoginPacket loginPacket) {
-            if (player != null) {
-                throw new IllegalStateException("Player already logged in");
-            }
-
-            System.out.println("Player " + loginPacket.globalName() + " has logged in!");
-            player = new Player(this, loginPacket.globalName());
-            server.getPlayerManager().addPlayer(player);
+            handleLogin(ctx, loginPacket);
         } else if (packet instanceof ChatPacket chatPacket) {
             System.out.println(player.getName() + ": " + chatPacket.message());
             server.getPlayerManager().broadcastMessage(player.getName() + ": " + chatPacket.message());
         }
+    }
+
+    private void handleLogin(ChannelHandlerContext ctx, LoginPacket loginPacket) {
+        DiscordAuth.auth(loginPacket.accessToken()).thenCompose(authResponse -> {
+            if (authResponse == null) {
+                throw new RuntimeException(loginPacket.username() + " failed to log in!");
+            }
+
+            return server.getPlayerDataStorage().getPlayerData(authResponse.uuid()).thenApply(playerData -> {
+                playerData.uuid = authResponse.uuid();
+                playerData.username = authResponse.username();
+                playerData.displayName = authResponse.displayName();
+                playerData.avatarUrl = authResponse.avatarUrl();
+                return playerData;
+            });
+        }).thenAccept(playerData -> {
+            if (player != null) {
+                throw new IllegalStateException("Player already logged in");
+            }
+
+            System.out.println("Player " + playerData.displayName + " has logged in!");
+            player = new Player(this, playerData);
+            server.getPlayerManager().addPlayer(player);
+        }).thenRun(() ->
+            sendPacket(loginPacket)
+        ).exceptionally(e -> {
+            e.printStackTrace();
+            ctx.close();
+            return null;
+        });
     }
 
     @Override
@@ -71,7 +96,7 @@ public class Connection extends SimpleChannelInboundHandler<WebSocketFrame> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
             //Channel upgrade to websocket, remove WebSocketIndexPageHandler.
-            ctx.pipeline().remove(WebSocketIndexPageHandler.class);
+            ctx.pipeline().remove(WebSocketServerHttpPageHandler.class);
         } else {
             super.userEventTriggered(ctx, evt);
         }

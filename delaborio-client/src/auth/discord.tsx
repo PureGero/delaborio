@@ -36,7 +36,7 @@ const fetchAccount = async (): Promise<Account | null> => {
       userid: `discord-${json.id}`,
       username: json.username,
       avatar: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.png`,
-      globalName: json.global_name,
+      displayName: json.global_name,
       accessToken: token,
     };
   }

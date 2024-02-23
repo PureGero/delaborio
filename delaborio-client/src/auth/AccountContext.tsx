@@ -5,6 +5,6 @@ export const AccountContext: React.Context<Account> = createContext({
   userid: '',
   username: '',
   avatar: '',
-  globalName: '',
+  displayName: '',
   accessToken: ''
 });

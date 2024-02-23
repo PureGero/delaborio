@@ -1,5 +1,7 @@
 package com.github.puregero.delaborio;
 
+import com.github.puregero.delaborio.database.PlayerDataStorage;
+import com.github.puregero.delaborio.database.S3PlayerDataStorage;
 import com.github.puregero.delaborio.websocket.WebSocketServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -9,6 +11,7 @@ public class DelaborioServer {
     private static final int SSL_PORT = Integer.parseInt(System.getProperty("sslport", "2053"));
 
     private final PlayerManager playerManager = new PlayerManager();
+    private final PlayerDataStorage playerDataStorage = new S3PlayerDataStorage();
 
     public static void main(String[] args) throws Exception {
         DelaborioServer server = new DelaborioServer();
@@ -31,5 +34,9 @@ public class DelaborioServer {
 
     public PlayerManager getPlayerManager() {
         return playerManager;
+    }
+
+    public PlayerDataStorage getPlayerDataStorage() {
+        return playerDataStorage;
     }
 }

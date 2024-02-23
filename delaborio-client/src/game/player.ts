@@ -7,6 +7,20 @@ const A_KEY = 65;
 const S_KEY = 83;
 const D_KEY = 68;
 
+export interface PlayerData {
+  uuid: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+
+  xp: number;
+  level: number;
+
+  friends: Map<string, string>;
+
+  playTimeSeconds: number;
+}
+
 export default class Player extends Entity {
   mesh: THREE.Mesh = this.generateMesh();
   position: THREE.Vector3 = new THREE.Vector3();

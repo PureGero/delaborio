@@ -14,7 +14,6 @@ export default function Renderer() {
     const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current });
 
     const onResize = () => {
-      console.log('onResize', window.innerWidth, window.innerHeight);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
       game.scene.camera.aspect = window.innerWidth / window.innerHeight;

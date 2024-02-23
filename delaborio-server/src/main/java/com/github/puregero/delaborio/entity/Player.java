@@ -1,16 +1,19 @@
 package com.github.puregero.delaborio.entity;
 
+import com.github.puregero.delaborio.database.PlayerData;
 import com.github.puregero.delaborio.net.Connection;
 import com.github.puregero.delaborio.net.packet.ChatPacket;
+
+import java.util.UUID;
 
 public class Player extends MobileEntity {
 
     private final Connection connection;
-    private final String name;
+    private final PlayerData playerData;
 
-    public Player(Connection connection, String name) {
+    public Player(Connection connection, PlayerData playerData) {
         this.connection = connection;
-        this.name = name;
+        this.playerData = playerData;
     }
 
     public void sendMessage(String message) {
@@ -18,6 +21,11 @@ public class Player extends MobileEntity {
     }
 
     public String getName() {
-        return name;
+        return playerData.displayName;
+    }
+
+    @Override
+    public UUID getUuid() {
+        return playerData.uuid;
     }
 }

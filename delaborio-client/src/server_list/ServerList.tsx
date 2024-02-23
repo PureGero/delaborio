@@ -1,25 +1,25 @@
 import { useContext, useEffect, useState } from "react";
 import { Server, pingServers } from "../net/servers";
-import { AccountContext } from "../auth/AccountContext";
 import PingIcon from "./PingIcon";
+import { PlayerDataContext } from "../game/PlayerDataContext";
 
 interface ServerListProps {
   joinServer: (server: Server) => void;
 }
 
 export default function ServerList(props: ServerListProps) {
-  const account = useContext(AccountContext);
+  const playerData = useContext(PlayerDataContext);
   const [servers, setServers] = useState<Server[]>([]);
 
   useEffect(() => {
-    pingServers(account.userid, servers => setServers([...servers])); // Need to clone the servers into a new object so that React knows to reender
-  }, [account.userid]);
+    pingServers(playerData, servers => setServers([...servers])); // Need to clone the servers into a new object so that React knows to rerender
+  }, [playerData]);
 
   return (
     <div className="py-6">
       <p className="text-center">Choose a server</p>
       {
-        servers/*.filter(server => server.ping)*/.map(server => (
+        servers.filter(server => server.ping || !server.hidden).map(server => (
           <button 
               disabled={!server.ping || server.full}
               key={server.name}

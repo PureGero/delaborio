@@ -10,7 +10,7 @@ export const GameContext: React.Context<Game> = createContext(new Game(
     userid: 'fake',
     username: 'fake',
     avatar: 'https://cdn.discordapp.com/avatars/123456789012345678/123456789012345678.png',
-    globalName: 'Fake',
+    displayName: 'Fake',
     accessToken: 'fake',
   }
 ));
