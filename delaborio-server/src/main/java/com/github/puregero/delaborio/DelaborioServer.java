@@ -18,8 +18,8 @@ public class DelaborioServer {
         WebSocketServer webSocketServer = new WebSocketServer(server);
 
         try {
-            ChannelFuture futuressl = webSocketServer.listenOn(webSocketServer.createSslContext(), SSL_PORT);
-            ChannelFuture future = webSocketServer.listenOn(PORT);
+            ChannelFuture futuressl = webSocketServer.listenOn(webSocketServer.createSslContext(), "0.0.0.0", SSL_PORT);
+            ChannelFuture future = webSocketServer.listenOn("0.0.0.0", PORT);
             Channel chssl = futuressl.sync().channel();
             Channel ch = future.sync().channel();
 
