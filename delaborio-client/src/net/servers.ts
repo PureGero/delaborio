@@ -9,6 +9,8 @@ export interface Server {
   players?: number;
   friends?: number;
   full?: boolean;
+  gitHash?: string;
+  errorMessage?: string;
 }
 
 // Server names: Alpheratz, Bellatrix, Capella, Diphda, Elnath, Fomalhaut, Gacrux, Hamal, Kochab, Menkar, Nunki, Procyon, Rigel, Schedar, Vega, Zubenelgenubi
@@ -66,11 +68,19 @@ export const pingServers = (playerData: PlayerData, callback: (servers: Server[]
           gitHash: process.env.REACT_APP_GIT_SHA
         }),
       });
+
       const data = await response.json();
       server.ping = (Date.now() - time) || 1; // 0 ping breaks things lol
       server.players = data.players;
       server.friends = data.friends;
       server.full = data.full;
+      server.gitHash = data.gitHash;
+
+      server.errorMessage =
+          data.gitHash && data.gitHash !== process.env.REACT_APP_GIT_SHA && !data.gitHash.includes('dirty') ? 'OUTDATED' :
+          data.full ? 'FULL' :
+          undefined;
+
       console.log(server);
       callback(servers);
 
