@@ -2,6 +2,7 @@ package com.github.puregero.delaborio.websocket;
 
 import com.github.puregero.delaborio.DelaborioServer;
 import com.google.gson.Gson;
+import com.jcabi.manifests.Manifests;
 import com.sun.management.OperatingSystemMXBean;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -35,7 +36,8 @@ public class PingHandler implements PageHandler {
                 true,
                 server.getPlayerManager().playerCount(),
                 request.friends == null ? 0 : server.getPlayerManager().countFriends(request.friends),
-                ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() > 0.8
+                ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() > 0.8,
+                Manifests.exists("SCM-Revision") ? Manifests.read("SCM-Revision") : "dirty"
         );
 
         ByteBuf content = Unpooled.copiedBuffer(gson.toJson(response), CharsetUtil.UTF_8);
@@ -48,5 +50,5 @@ public class PingHandler implements PageHandler {
 
     private record PingRequest(UUID uuid, Map<UUID, String> friends, String gitHash) {}
 
-    private record PingResponse(boolean alive, int players, int friends, boolean full) {}
+    private record PingResponse(boolean alive, int players, int friends, boolean full, String gitHash) {}
 }

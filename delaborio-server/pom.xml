@@ -52,6 +52,13 @@
             <version>2.24.7</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- for reading manifest information -->
+        <dependency>
+            <groupId>com.jcabi</groupId>
+            <artifactId>jcabi-manifests</artifactId>
+            <version>2.1.0</version>
+        </dependency>
     </dependencies>
     
     <build>
@@ -83,7 +90,27 @@
                                 com.github.puregero.delaborio.DelaborioServer
                             </mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <SCM-Revision>${git.commit.id.describe-short}</SCM-Revision>
+                        </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.9.10</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
                 </configuration>
             </plugin>
             <plugin>

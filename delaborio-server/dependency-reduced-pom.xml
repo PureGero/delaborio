@@ -31,7 +31,27 @@
             <manifest>
               <mainClass>com.github.puregero.delaborio.DelaborioServer</mainClass>
             </manifest>
+            <manifestEntries>
+              <SCM-Revision>${git.commit.id.describe-short}</SCM-Revision>
+            </manifestEntries>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.9.10</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
         </configuration>
       </plugin>
       <plugin>
